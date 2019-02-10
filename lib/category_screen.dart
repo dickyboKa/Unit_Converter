@@ -11,13 +11,6 @@ class Category extends StatelessWidget {
   final IconData iconLocation;
   //final List<Unit> units;
 
-  /// Creates a [Category].
-  ///
-  /// A [Category] saves the name of the Category (e.g. 'Length'), its color for
-  /// the UI, and the icon that represents it (e.g. a ruler).
-  // While the @required checks for whether a named parameter is passed in,
-  // it doesn't check whether the object passed in is null. We check that
-  // in the assert statement.
   const Category({
     Key key,
     @required this.name,
@@ -47,7 +40,7 @@ class Category extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Container(
-        height: 95.0,
+        height: 105.0,
         width: 65.0,
         child: InkWell(
           borderRadius: _borderRadius,

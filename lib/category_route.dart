@@ -43,15 +43,16 @@ class CategoryRoute extends StatelessWidget {
   ];
 
   Widget _buildCategoryRowWidgets(List<Widget> categories, int i) {
-    int index = i % 3;
+    int iTab = i * 4;
     return Container(
         padding: EdgeInsets.all(4.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            categories[i],
-            categories[i + 1],
-            categories[i + 2],
+            categories[iTab],
+            categories[iTab + 1],
+            categories[iTab + 2],
+            categories[iTab + 3],
           ],
         ));
   }
@@ -88,7 +89,7 @@ class CategoryRoute extends StatelessWidget {
         //units: _retrieveUnitList(_categoryNames[i]),
       ));
     }
-    print((categories.length / 3).round());
+
     final listView = Container(
       color: _categoryColor,
       padding: EdgeInsets.symmetric(horizontal: 8.0),
