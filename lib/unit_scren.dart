@@ -17,13 +17,14 @@ class UnitScreen extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _CustomUnitScreen(units: units, convert: convert, callback: callback);
+    return _CustomUnitScreen(
+        units: units, convert: convert, callback: callback);
   }
 }
 
 class _CustomUnitScreen extends State<UnitScreen> {
-  final inputTxtController = TextEditingController();
-  final displayTxtController = TextEditingController();
+  final inputController = TextEditingController();
+  final diplsayController = TextEditingController();
   Function(String, int, int) callback;
 
   String defaultTextA;
@@ -46,82 +47,105 @@ class _CustomUnitScreen extends State<UnitScreen> {
   void initState() {
     super.initState();
 
-    inputTxtController.addListener(_responseToChange);
+    inputController.addListener(_responseToChange);
   }
+
   _responseToChange() {
     setState(() {
-      String output = callback(inputTxtController.text, from, to);
-      displayTxtController.text = output;
+      String output = callback(inputController.text, from, to);
+      diplsayController.text = output;
     });
   }
 
   @override
   void dispose() {
-    inputTxtController.dispose();
-    displayTxtController.dispose();
+    inputController.dispose();
+    diplsayController.dispose();
     super.dispose();
   }
 
+  Widget textView(bool enable, TextEditingController controller, String label) {
+    return Container(
+      padding:
+          EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+      child: TextFormField(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: label,
+        ),
+        enabled: enable,
+        controller: controller,
+        keyboardType: TextInputType.number,
+      ),
+    );
+  }
+
+  Widget dropDownView(bool textA) {
+    return Container(
+        padding:
+            EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+        child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                border: Border.all(color: Colors.black38)),
+            height: 65,
+            padding: EdgeInsets.all(10.0),
+            child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+              isExpanded: true,
+              value:
+                  textA ? defaultTextA ?? units[0] : defaultTextB ?? units[0],
+              items: units.map((String location) {
+                return DropdownMenuItem<String>(
+                  value: location,
+                  child: Text(location),
+                );
+              }).toList(),
+              onChanged: (String _value) {
+                setState(() {
+                  if (textA)
+                    defaultTextA = _value;
+                  else
+                    defaultTextB = _value;
+
+                  from = units.indexOf(_value) + 1;
+                  if (inputController.text.isNotEmpty) {
+                    String output = callback(inputController.text, from, to);
+                    diplsayController.text = output;
+                  }
+                });
+              },
+            ))));
+  }
+
+  Widget iconArrow() {
+    return Container(
+      height: 70,
+      padding: EdgeInsets.only(top: 10.0, bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 40.0),
+          child: Icon(Icons.arrow_upward)),
+          Icon(Icons.arrow_downward),
+        ],
+      )
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
+        padding: EdgeInsets.only(top: 20.0),
         child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        TextFormField(
-          controller: inputTxtController,
-          keyboardType: TextInputType.number,
-        ),
-        DropdownButton<String>(
-          value: defaultTextA ?? units[0],
-          items: units.map((String location) {
-            return DropdownMenuItem<String>(
-              value: location,
-              child: Text(location),
-            );
-          }).toList(),
-          onChanged: (String _value) {
-            setState(() {
-              defaultTextA = _value;
-              from = units.indexOf(_value) + 1;
-              if (inputTxtController.text.isNotEmpty) {
-                String output = callback(inputTxtController.text, from, to);
-                displayTxtController.text = output;
-              }
-            });
-          },
-        ),
-        RaisedButton(
-            child: Icon(Icons.arrow_downward),
-            onPressed: () {
-              setState(() {
-                displayTxtController.text = inputTxtController.text;
-              });
-            }),
-        TextField(
-          enabled: false,
-          controller: displayTxtController,
-        ),
-        DropdownButton<String>(
-          value: defaultTextB ?? units[0],
-          items: units.map((String location) {
-            return DropdownMenuItem<String>(
-              value: location,
-              child: Text(location),
-            );
-          }).toList(),
-          onChanged: (String _value) {
-            setState(() {
-              defaultTextB = _value;
-              to = units.indexOf(_value) + 1;
-              if (inputTxtController.text.isNotEmpty) {
-                String output = callback(inputTxtController.text, from, to);
-                displayTxtController.text = output;
-              }
-            });
-          },
-        ),
-      ],
-    ));
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            textView(true, inputController, "Input"),
+            dropDownView(true),
+            iconArrow(),
+            textView(false, diplsayController, "Output"),
+            dropDownView(false),
+          ],
+        ));
   }
 }
