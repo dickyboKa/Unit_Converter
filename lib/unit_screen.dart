@@ -40,10 +40,14 @@ class UnitScreenState extends StatefulWidget {
 }
 
 class _CustomUnitScreen extends State<UnitScreenState> {
-  final inputTxt = TextEditingController();
-  final displayTxt = TextEditingController();
+  final inputTxtController = TextEditingController();
+  final displayTxtController = TextEditingController();
   String defaultTextA;
   String defaultTextB;
+
+  int from = 0;
+  int to = 0;
+
   final List<String> units;
   final int convert;
 
@@ -54,9 +58,35 @@ class _CustomUnitScreen extends State<UnitScreenState> {
         assert(convert != null);
 
   @override
+  void initState() {
+    super.initState();
+
+    inputTxtController.addListener(_responseToChange);
+  }
+
+  String __calculateConversion(String input) {
+    double inputNum = double.parse(input);
+    int ratio = to - from;
+    if (ratio > 0) {
+      return (inputNum * (convert * ratio)).toString();
+    } else if (ratio < to) {
+      return (inputNum / (convert * ratio.abs())).toString();
+    } else {
+      return input;
+    }
+  }
+
+  _responseToChange() {
+    setState(() {
+      String output = __calculateConversion(inputTxtController.text);
+      displayTxtController.text = output;
+    });
+  }
+
+  @override
   void dispose() {
-    inputTxt.dispose();
-    displayTxt.dispose();
+    inputTxtController.dispose();
+    displayTxtController.dispose();
     super.dispose();
   }
 
@@ -64,10 +94,10 @@ class _CustomUnitScreen extends State<UnitScreenState> {
   Widget build(BuildContext context) {
     return Container(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         TextFormField(
-          controller: inputTxt,
+          controller: inputTxtController,
           keyboardType: TextInputType.number,
         ),
         DropdownButton<String>(
@@ -81,7 +111,11 @@ class _CustomUnitScreen extends State<UnitScreenState> {
           onChanged: (String _value) {
             setState(() {
               defaultTextA = _value;
-              // displayTxt.text = _value;
+              from = units.indexOf(_value) + 1;
+              if (inputTxtController.text.isNotEmpty) {
+                String output = __calculateConversion(inputTxtController.text);
+                displayTxtController.text = output;
+              }
             });
           },
         ),
@@ -89,11 +123,11 @@ class _CustomUnitScreen extends State<UnitScreenState> {
             child: Icon(Icons.arrow_downward),
             onPressed: () {
               setState(() {
-                displayTxt.text = inputTxt.text;
+                displayTxtController.text = inputTxtController.text;
               });
             }),
         TextField(
-          controller: displayTxt,
+          controller: displayTxtController,
         ),
         DropdownButton<String>(
           value: defaultTextB ?? units[0],
@@ -106,7 +140,11 @@ class _CustomUnitScreen extends State<UnitScreenState> {
           onChanged: (String _value) {
             setState(() {
               defaultTextB = _value;
-              // displayTxt.text = _value;
+              to = units.indexOf(_value) + 1;
+              if (inputTxtController.text.isNotEmpty) {
+                String output = __calculateConversion(inputTxtController.text);
+                displayTxtController.text = output;
+              }
             });
           },
         ),
