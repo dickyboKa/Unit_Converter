@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'package:unit_converter/unit.dart';
-import 'package:unit_converter/unit_screen.dart';
+import 'package:unit_converter/unit_route.dart';
 
 class ConverterRoute extends StatelessWidget {
 
@@ -57,7 +57,7 @@ class ConverterRoute extends StatelessWidget {
     }).toList();
 
     if (name == 'Digital Storage') {
-      return UnitScreen(
+      return UnitRoute(
         units: digitalStorage,
         convert: 1024,
       );

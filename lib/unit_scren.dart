@@ -1,47 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-class UnitScreen extends StatelessWidget {
+class UnitScreen extends StatefulWidget {
   final List<String> units;
   final int convert;
+  final Function(String, int, int) callback;
 
-  const UnitScreen({
+  UnitScreen({
     Key key,
     @required this.units,
     @required this.convert,
-  })  : assert(units != null),
-        assert(convert != null),
-        super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return UnitScreenState(
-      units: units,
-      convert: convert,
-    );
-  }
-}
-
-class UnitScreenState extends StatefulWidget {
-  final List<String> units;
-  final int convert;
-
-  UnitScreenState({
-    Key key,
-    @required this.units,
-    @required this.convert,
+    this.callback,
   })  : assert(units != null),
         assert(convert != null),
         super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _CustomUnitScreen(units: units, convert: convert);
+    return _CustomUnitScreen(units: units, convert: convert, callback: callback);
   }
 }
 
-class _CustomUnitScreen extends State<UnitScreenState> {
+class _CustomUnitScreen extends State<UnitScreen> {
   final inputTxtController = TextEditingController();
   final displayTxtController = TextEditingController();
+  Function(String, int, int) callback;
+
   String defaultTextA;
   String defaultTextB;
 
@@ -54,6 +38,7 @@ class _CustomUnitScreen extends State<UnitScreenState> {
   _CustomUnitScreen({
     @required this.units,
     @required this.convert,
+    this.callback,
   })  : assert(units != null),
         assert(convert != null);
 
@@ -63,22 +48,9 @@ class _CustomUnitScreen extends State<UnitScreenState> {
 
     inputTxtController.addListener(_responseToChange);
   }
-
-  String __calculateConversion(String input) {
-    double inputNum = double.parse(input);
-    int ratio = to - from;
-    if (ratio > 0) {
-      return (inputNum * (convert * ratio)).toString();
-    } else if (ratio < to) {
-      return (inputNum / (convert * ratio.abs())).toString();
-    } else {
-      return input;
-    }
-  }
-
   _responseToChange() {
     setState(() {
-      String output = __calculateConversion(inputTxtController.text);
+      String output = callback(inputTxtController.text, from, to);
       displayTxtController.text = output;
     });
   }
@@ -113,7 +85,7 @@ class _CustomUnitScreen extends State<UnitScreenState> {
               defaultTextA = _value;
               from = units.indexOf(_value) + 1;
               if (inputTxtController.text.isNotEmpty) {
-                String output = __calculateConversion(inputTxtController.text);
+                String output = callback(inputTxtController.text, from, to);
                 displayTxtController.text = output;
               }
             });
@@ -127,6 +99,7 @@ class _CustomUnitScreen extends State<UnitScreenState> {
               });
             }),
         TextField(
+          enabled: false,
           controller: displayTxtController,
         ),
         DropdownButton<String>(
@@ -142,7 +115,7 @@ class _CustomUnitScreen extends State<UnitScreenState> {
               defaultTextB = _value;
               to = units.indexOf(_value) + 1;
               if (inputTxtController.text.isNotEmpty) {
-                String output = __calculateConversion(inputTxtController.text);
+                String output = callback(inputTxtController.text, from, to);
                 displayTxtController.text = output;
               }
             });
