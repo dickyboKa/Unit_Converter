@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:unit_converter/category_screen.dart';
-//import 'package:task_04_navigation/unit.dart';
+import 'package:unit_converter/unit.dart';
 
 final _categoryColor = Colors.white;
 final _appBarColor = Colors.teal;
@@ -10,23 +10,23 @@ class CategoryRoute extends StatelessWidget {
   const CategoryRoute();
 
   static const _categoryNames = <String>[
+    'Digital Storage',
     'Length',
     'Area',
     'Volume',
     'Mass',
     'Time',
-    'Digital Storage',
     'Energy',
     'Currency',
   ];
 
   static const _iconLocation = <IconData>[
+    Icons.sd_card,
     Icons.straighten,
     Icons.dashboard,
     Icons.battery_full,
     Icons.call_to_action,
     Icons.access_time,
-    Icons.sd_card,
     Icons.flash_on,
     Icons.attach_money,
   ];
@@ -67,15 +67,15 @@ class CategoryRoute extends StatelessWidget {
   }
 
   /// Returns a list of mock [Unit]s.
-  //List<Unit> _retrieveUnitList(String categoryName) {
-  //  return List.generate(10, (int i) {
-  //    i += 1;
-  //    return Unit(
-  //      name: '$categoryName Unit $i',
-  //      conversion: i.toDouble(),
-  //    );
-  //  });
-  //}
+  List<Unit> _retrieveUnitList(String categoryName) {
+    return List.generate(10, (int i) {
+      i += 1;
+      return Unit(
+        name: '$categoryName Unit $i',
+        conversion: i.toDouble(),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ class CategoryRoute extends StatelessWidget {
         name: _categoryNames[i],
         color: _baseColors[i],
         iconLocation: _iconLocation[i],
-        //units: _retrieveUnitList(_categoryNames[i]),
+        units: _retrieveUnitList(_categoryNames[i]),
       ));
     }
 
