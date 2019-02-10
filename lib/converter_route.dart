@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'package:unit_converter/unit.dart';
+import 'package:unit_converter/unit_screen.dart';
 
 class ConverterRoute extends StatelessWidget {
+
+  static const digitalStorage = <String>[
+    'Byte',
+    'Kilobyte(KB)',
+    'Megabyte(MB)',
+    'Gigabyte(GB)',
+    'Terabyte(TB)',
+    'Petabyte(PB)',
+    'Exabyte(EB)',
+  ];
   /// This [Category]'s name.
   final String name;
 
@@ -46,7 +57,10 @@ class ConverterRoute extends StatelessWidget {
     }).toList();
 
     if (name == 'Digital Storage') {
-      return digitalStorageScreen;
+      return UnitScreen(
+        units: digitalStorage,
+        convert: 1024,
+      );
     } else {
       return ListView(
         children: unitWidgets,
