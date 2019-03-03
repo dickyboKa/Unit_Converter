@@ -1,47 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import 'package:unit_converter/unit.dart';
+
 class UnitScreen extends StatefulWidget {
-  final List<String> units;
-  final int convert;
-  final Function(String, int, int) callback;
+  final List<Unit> dropDownItems;
 
   UnitScreen({
-    Key key,
-    @required this.units,
-    @required this.convert,
-    this.callback,
-  })  : assert(units != null),
-        assert(convert != null),
+    final Key key,
+    @required this.dropDownItems,
+  })  : assert(dropDownItems != null),
         super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _CustomUnitScreen(
-        units: units, convert: convert, callback: callback);
+    return _CustomUnitScreen(dropDownItems: dropDownItems);
   }
 }
 
 class _CustomUnitScreen extends State<UnitScreen> {
   final inputController = TextEditingController();
   final diplsayController = TextEditingController();
-  Function(String, int, int) callback;
 
   String defaultTextA;
   String defaultTextB;
 
-  int from = 0;
-  int to = 0;
+  double from = 0;
+  double to = 0;
 
-  final List<String> units;
-  final int convert;
+  final List<Unit> dropDownItems;
 
   _CustomUnitScreen({
-    @required this.units,
-    @required this.convert,
-    this.callback,
-  })  : assert(units != null),
-        assert(convert != null);
+    @required this.dropDownItems,
+  })  : assert(dropDownItems != null);
 
   @override
   void initState() {
@@ -50,9 +41,37 @@ class _CustomUnitScreen extends State<UnitScreen> {
     inputController.addListener(_responseToChange);
   }
 
+  double _calculateConversion(String input) {
+    if(input.isEmpty) return 0.0;
+    double _inputValue = double.parse(input);
+    return _inputValue * (to / from);
+  }
+
+  __responeToChangeDrop(String _value, bool textA) {
+    Unit changeUnit;
+    dropDownItems.forEach((Unit unit){
+      if(unit.name == _value)
+          changeUnit = unit;
+    });
+
+    setState(() {
+      if (textA) {
+        print("YOWHAT");
+        defaultTextA = "Monkey";
+        from = changeUnit.conversion;
+      }       
+      else {
+        defaultTextB = _value;
+        to = changeUnit.conversion;
+      }    
+      String output = _calculateConversion(inputController.text).toString();
+      diplsayController.text = output;
+    });
+  }
+
   _responseToChange() {
     setState(() {
-      String output = callback(inputController.text, from, to);
+      String output = _calculateConversion(inputController.text).toString();
       diplsayController.text = output;
     });
   }
@@ -93,28 +112,17 @@ class _CustomUnitScreen extends State<UnitScreen> {
             child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
               isExpanded: true,
-              value:
-                  textA ? defaultTextA ?? units[0] : defaultTextB ?? units[0],
-              items: units.map((String location) {
+              value: defaultTextA,
+                  //textA ? defaultTextA ?? dropDownItems[0] : defaultTextB ?? dropDownItems[0],
+              items: dropDownItems.map((Unit unit) {
                 return DropdownMenuItem<String>(
-                  value: location,
-                  child: Text(location),
+                  value: unit.name,
+                  child: Text(unit.name),
                 );
               }).toList(),
-              onChanged: (String _value) {
-                setState(() {
-                  if (textA)
-                    defaultTextA = _value;
-                  else
-                    defaultTextB = _value;
-
-                  from = units.indexOf(_value) + 1;
-                  if (inputController.text.isNotEmpty) {
-                    String output = callback(inputController.text, from, to);
-                    diplsayController.text = output;
-                  }
-                });
-              },
+              onChanged: (String _value) { 
+                 setState(() { defaultTextA = _value;});
+              },//__responeToChangeDrop(_value, textA);},
             ))));
   }
 
@@ -135,6 +143,10 @@ class _CustomUnitScreen extends State<UnitScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    from = dropDownItems.first.conversion;
+    to = dropDownItems.first.conversion;
+    defaultTextA = dropDownItems.first.name;
+    defaultTextB = dropDownItems.first.name;
     return Container(
         padding: EdgeInsets.only(top: 20.0),
         child: Column(

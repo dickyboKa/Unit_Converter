@@ -15,16 +15,12 @@ class ConverterRoute extends StatelessWidget {
     'Petabyte(PB)',
     'Exabyte(EB)',
   ];
-  /// This [Category]'s name.
   final String name;
 
-  /// Color for this [Category].
   final Color color;
 
-  /// Units for this [Category].
   final List<Unit> units;
 
-  /// This [ConverterRoute] requires the name, color, and units to not be null.
   const ConverterRoute({
     @required this.name,
     @required this.color,
@@ -56,15 +52,6 @@ class ConverterRoute extends StatelessWidget {
       );
     }).toList();
 
-    if (name == 'Digital Storage') {
-      return UnitRoute(
-        units: digitalStorage,
-        convert: 1024,
-      );
-    } else {
-      return ListView(
-        children: unitWidgets,
-      );
-    }
+    return UnitRoute(units: units);
   }
 }
