@@ -103,7 +103,6 @@ class _CategoryRouteState extends State<CategoryRoute> {
     data.keys.forEach((key) {
       final List<Unit> units =
           data[key].map<Unit>((dynamic data) => Unit.fromJson(data)).toList();
-      print(units.length);
       var category = Category(
         name: key,
         units: units,

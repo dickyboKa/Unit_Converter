@@ -56,8 +56,7 @@ class _CustomUnitScreen extends State<UnitScreen> {
 
     setState(() {
       if (textA) {
-        print("YOWHAT");
-        defaultTextA = "Monkey";
+        defaultTextA = _value;
         from = changeUnit.conversion;
       }       
       else {
@@ -112,17 +111,14 @@ class _CustomUnitScreen extends State<UnitScreen> {
             child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
               isExpanded: true,
-              value: defaultTextA,
-                  //textA ? defaultTextA ?? dropDownItems[0] : defaultTextB ?? dropDownItems[0],
+              value: textA ? defaultTextA ?? dropDownItems.first.name : defaultTextB ?? dropDownItems.first.name,
               items: dropDownItems.map((Unit unit) {
                 return DropdownMenuItem<String>(
                   value: unit.name,
                   child: Text(unit.name),
                 );
               }).toList(),
-              onChanged: (String _value) { 
-                 setState(() { defaultTextA = _value;});
-              },//__responeToChangeDrop(_value, textA);},
+              onChanged: (String _value) { __responeToChangeDrop(_value, textA);},
             ))));
   }
 
@@ -145,8 +141,6 @@ class _CustomUnitScreen extends State<UnitScreen> {
   Widget build(BuildContext context) {
     from = dropDownItems.first.conversion;
     to = dropDownItems.first.conversion;
-    defaultTextA = dropDownItems.first.name;
-    defaultTextB = dropDownItems.first.name;
     return Container(
         padding: EdgeInsets.only(top: 20.0),
         child: Column(
