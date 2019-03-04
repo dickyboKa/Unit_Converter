@@ -15,18 +15,17 @@ class CategoryRoute extends StatefulWidget {
   @override
   _CategoryRouteState createState() => _CategoryRouteState();
 }
-class _CategoryRouteState extends State<CategoryRoute> {
 
+class _CategoryRouteState extends State<CategoryRoute> {
   final _categories = <Category>[];
   static const _iconLocation = <IconData>[
-    Icons.sd_card,
     Icons.straighten,
     Icons.dashboard,
-    Icons.battery_full,
     Icons.call_to_action,
+    Icons.battery_full,
     Icons.access_time,
+    Icons.sd_card,
     Icons.flash_on,
-    Icons.attach_money,
   ];
 
   static const _baseColors = <Color>[
@@ -42,17 +41,34 @@ class _CategoryRouteState extends State<CategoryRoute> {
 
   Widget _buildCategoryRowWidgets(List<Widget> categories, int i) {
     int iTab = i * 4;
-    return Container(
-        padding: EdgeInsets.all(4.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            categories[iTab],
-            categories[iTab + 1],
-            categories[iTab + 2],
-            categories[iTab + 3],
-          ],
-        ));
+    print("Dicky " + iTab.toString());
+    if (iTab != 4) {
+      // very hack, will found a better solution to fill row with flexible child,
+      return Container(
+          padding: EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              categories[iTab],
+              categories[iTab + 1],
+              categories[iTab + 2],
+              categories[iTab + 3],
+            ],
+          ));
+    } else {
+      return Container(
+          padding: EdgeInsets.all(4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              categories[iTab],
+              Padding(
+                padding: EdgeInsets.only(left: 36.0),
+                child: categories[iTab + 1], 
+              )
+            ],
+          ));
+    }
   }
 
   Widget _buildCategoryWidgets(List<Widget> categories) {
@@ -73,16 +89,6 @@ class _CategoryRouteState extends State<CategoryRoute> {
     );
   }
 
-  List<Unit> _retrieveUnitList(String categoryName) {
-    return List.generate(10, (int i) {
-      i += 1;
-      return Unit(
-        name: '$categoryName Unit $i',
-        conversion: i.toDouble(),
-      );
-    });
-  }
-
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
@@ -94,8 +100,9 @@ class _CategoryRouteState extends State<CategoryRoute> {
   }
 
   Future<void> _retrieveLocalCategories() async {
-    final jsonStr = await DefaultAssetBundle.of(context).loadString('assets/data/regular_units.json');
-    final data = json.JsonDecoder().convert( jsonStr);
+    final jsonStr = await DefaultAssetBundle.of(context)
+        .loadString('assets/data/regular_units.json');
+    final data = json.JsonDecoder().convert(jsonStr);
     if (data is! Map) {
       throw ('Data retrieved from API is not a Map');
     }
@@ -107,7 +114,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
         name: key,
         units: units,
         color: _baseColors[categoryIndex],
-        iconLocation: Icons.cake,
+        iconLocation: _iconLocation[categoryIndex],
       );
 
       setState(() {
@@ -116,6 +123,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
       ++categoryIndex;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     if (_categories.isEmpty) {
@@ -131,7 +139,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
     final listView = Container(
       color: _categoryColor,
       padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: _buildCategoryWidgetsSimple(_categories),
+      child: _buildCategoryWidgets(_categories),
     );
 
     final appBar = AppBar(
