@@ -21,7 +21,7 @@ class UnitScreen extends StatefulWidget {
 class _CustomUnitScreen extends State<UnitScreen> {
   final inputController = TextEditingController();
   final diplsayController = TextEditingController();
-
+  bool _showValidationError = false;
   String defaultTextA;
   String defaultTextB;
 
@@ -44,9 +44,20 @@ class _CustomUnitScreen extends State<UnitScreen> {
     inputController.addListener(_responseToChange);
   }
 
-  double _calculateConversion(String input) {
-    double _inputValue = double.parse(input);
-    return _inputValue * (to / from);
+  String _calculateConversion(double input) {
+    double conversion = input * (to / from);
+    var outputNum = conversion.toStringAsPrecision(7);
+    if (outputNum.contains('.') && outputNum.endsWith('0')) {
+      var i = outputNum.length - 1;
+      while (outputNum[i] == '0') {
+        i -= 1;
+      }
+      outputNum = outputNum.substring(0, i + 1);
+    }
+    if (outputNum.endsWith('.')) {
+      return outputNum.substring(0, outputNum.length - 1);
+    }
+    return outputNum;
   }
 
   __responeToChangeDrop(String _value, bool textA) {
@@ -64,8 +75,18 @@ class _CustomUnitScreen extends State<UnitScreen> {
         to = changeUnit.conversion;
       }
       if (inputController.text.isNotEmpty) {
-        String output = _calculateConversion(inputController.text).toString();
+        // Even though we are using the numerical keyboard, we still have to check
+        // for non-numerical input such as '5..0' or '6 -3'
+        try {
+          final inputDouble = double.parse(_value);
+          _showValidationError = false;
+          String output = _calculateConversion(inputDouble);
+          diplsayController.text = output;
         diplsayController.text = output;
+        } on Exception catch (e) {
+          print('Error: $e');
+          _showValidationError = true;
+        }
       }
     });
   }
@@ -73,8 +94,16 @@ class _CustomUnitScreen extends State<UnitScreen> {
   _responseToChange() {
     if (inputController.text.isNotEmpty) {
       setState(() {
-        String output = _calculateConversion(inputController.text).toString();
+        try {
+          final inputDouble = double.parse(inputController.text);
+          _showValidationError = false;
+          String output = _calculateConversion(inputDouble);
+          diplsayController.text = output;
         diplsayController.text = output;
+        } on Exception catch (e) {
+          print('Error: $e');
+          _showValidationError = true;
+        }
       });
     }
   }
@@ -94,6 +123,7 @@ class _CustomUnitScreen extends State<UnitScreen> {
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: label,
+          errorText: _showValidationError ? 'Invalid number entered' : null,
         ),
         enabled: enable,
         controller: controller,
@@ -105,7 +135,7 @@ class _CustomUnitScreen extends State<UnitScreen> {
   Widget dropDownView(bool textA) {
     return Container(
         padding:
-            EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
+            EdgeInsets.only(top: 15.0, left: 20.0, right: 20.0),
         child: Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(7.0)),
