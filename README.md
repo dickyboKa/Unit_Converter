@@ -3,7 +3,9 @@
 A new Flutter project.
 What is Flutter: https://flutter.io/
 
-#Status#
-- Currently the only working unit is Digital Storage
+#what's New#
+- Remove all the mocking object
+- All unit converter is working
+- Data of conversion is retrieve from json, located on assets folder
 
 ![](app_show.gif)
