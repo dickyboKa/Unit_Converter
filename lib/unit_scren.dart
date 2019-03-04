@@ -25,14 +25,17 @@ class _CustomUnitScreen extends State<UnitScreen> {
   String defaultTextA;
   String defaultTextB;
 
-  double from = 0;
-  double to = 0;
+  double from;
+  double to;
 
   final List<Unit> dropDownItems;
 
   _CustomUnitScreen({
     @required this.dropDownItems,
-  })  : assert(dropDownItems != null);
+  }) : assert(dropDownItems != null) {
+    from = dropDownItems.first.conversion;
+    to = dropDownItems.first.conversion;
+  }
 
   @override
   void initState() {
@@ -42,37 +45,38 @@ class _CustomUnitScreen extends State<UnitScreen> {
   }
 
   double _calculateConversion(String input) {
-    if(input.isEmpty) return 0.0;
     double _inputValue = double.parse(input);
     return _inputValue * (to / from);
   }
 
   __responeToChangeDrop(String _value, bool textA) {
     Unit changeUnit;
-    dropDownItems.forEach((Unit unit){
-      if(unit.name == _value)
-          changeUnit = unit;
+    dropDownItems.forEach((Unit unit) {
+      if (unit.name == _value) changeUnit = unit;
     });
 
     setState(() {
       if (textA) {
         defaultTextA = _value;
         from = changeUnit.conversion;
-      }       
-      else {
+      } else {
         defaultTextB = _value;
         to = changeUnit.conversion;
-      }    
-      String output = _calculateConversion(inputController.text).toString();
-      diplsayController.text = output;
+      }
+      if (inputController.text.isNotEmpty) {
+        String output = _calculateConversion(inputController.text).toString();
+        diplsayController.text = output;
+      }
     });
   }
 
   _responseToChange() {
-    setState(() {
-      String output = _calculateConversion(inputController.text).toString();
-      diplsayController.text = output;
-    });
+    if (inputController.text.isNotEmpty) {
+      setState(() {
+        String output = _calculateConversion(inputController.text).toString();
+        diplsayController.text = output;
+      });
+    }
   }
 
   @override
@@ -111,36 +115,38 @@ class _CustomUnitScreen extends State<UnitScreen> {
             child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
               isExpanded: true,
-              value: textA ? defaultTextA ?? dropDownItems.first.name : defaultTextB ?? dropDownItems.first.name,
+              value: textA
+                  ? defaultTextA ?? dropDownItems.first.name
+                  : defaultTextB ?? dropDownItems.first.name,
               items: dropDownItems.map((Unit unit) {
                 return DropdownMenuItem<String>(
                   value: unit.name,
                   child: Text(unit.name),
                 );
               }).toList(),
-              onChanged: (String _value) { __responeToChangeDrop(_value, textA);},
+              onChanged: (String _value) {
+                __responeToChangeDrop(_value, textA);
+              },
             ))));
   }
 
   Widget iconArrow() {
     return Container(
-      height: 70,
-      padding: EdgeInsets.only(top: 10.0, bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 40.0),
-          child: Icon(Icons.arrow_upward)),
-          Icon(Icons.arrow_downward),
-        ],
-      )
-    );
+        height: 70,
+        padding: EdgeInsets.only(top: 10.0, bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+                padding: EdgeInsets.only(bottom: 40.0),
+                child: Icon(Icons.arrow_upward)),
+            Icon(Icons.arrow_downward),
+          ],
+        ));
   }
+
   @override
   Widget build(BuildContext context) {
-    from = dropDownItems.first.conversion;
-    to = dropDownItems.first.conversion;
     return Container(
         padding: EdgeInsets.only(top: 20.0),
         child: Column(
